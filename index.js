@@ -1,7 +1,52 @@
 let humanScore = 0,
     computerScore = 0;
+    round = 0;
 
+const container = document.querySelector(".container");
+const winner = document.getElementById("winner");
+const resultText = document.querySelector(".result");
+const score = document.querySelector(".score");
 
+document.addEventListener("DOMContentLoaded", listeners);
+
+function listeners(){
+
+    container.addEventListener("click", playGame);
+    setTimeout(()=> alert("Eliga una opción para comenzar a jugar"),1000)
+   
+}
+
+const playGame = (e)=>{
+   
+    if(e.target && e.target.tagName ==="BUTTON"){
+        if(round < 5){
+            const optionHuman = e.target.dataset.accion;
+            const optionMachine = getComputerChoice();
+            playRound(optionHuman,optionMachine);  
+        }
+        else{
+            if(humanScore === computerScore){
+                winner.textContent = "!Empatasteis!";
+            }
+            else if(humanScore > computerScore){
+                winner.textContent = "!El jugador gana!";
+            }
+            else{
+                winner.textContent = "!La máquina gana!";
+            }
+           resultText.textContent = "";
+           setTimeout(()=>{
+            const reset = confirm("¿Desea jugar una nueva partida?")
+
+            reset ? location.href = "index.html" : false;
+           }, 2000)
+           
+
+          
+        }
+      
+    }
+}
 const getComputerChoice = ()=>{
     const randomNumber = Math.random().toFixed(2);
 
@@ -21,50 +66,41 @@ const getComputerChoice = ()=>{
 }
 
 
-const getHumanChoice = ()=>{
-    const inputProperty = prompt("Eliga entre: piedra, papel o tijera");
-
-    return inputProperty.toLowerCase();
-}
-
-
-
 const playRound = (humanChoice, computerChoice)=>{
-    console.log(humanChoice,computerChoice);
+   
     const rules = {
         piedra: { piedra: 'empate', tijeras: 'gana', papel: 'pierde' },
         tijeras: { piedra: 'pierde', tijeras: 'empate', papel: 'gana' },
         papel: { piedra: 'gana', tijeras: 'pierde', papel: 'empate' }
     };
 
-    // Verificar el resultado utilizando el objeto de reglas
     const result = rules[humanChoice][computerChoice];
-
     
-    // Actualizar puntajes y mostrar el mensaje basado en el resultado
+    
+   updateResult(transformLower(result),humanChoice,computerChoice);
+   round++;
+}
+    
+const transformUpper = text => text.charAt(0).toUpperCase() + text.slice(1);   
+const transformLower = text => text.toLowerCase();
+
+const updateResult = (result, human,computer)=>{
+   
     if (result === 'empate') {
-        console.log("Empate, no se mueven los marcadores");
+        winner.textContent = "Empate, no se mueven los marcadores";
+
     } else if (result === 'gana') {
         humanScore++;
-        console.log(`¡GANASTE! humano: ${humanScore} - computadora: ${computerScore}`);
+        winner.textContent = "¡El jugador gana!";
+      
     } else if (result === 'pierde') {
         computerScore++;
-        console.log(`La computadora ganó, humano: ${humanScore} - computadora: ${computerScore}`);
+        winner.textContent = "¡La máquina gana!";
     }
-
-    alert(`Humano: ${humanScore} - Computadora: ${computerScore}`);
-}
-    
-
-
-
-
-const playGame = ()=>{
-    let i=0;
-    while(i < 5){
-        playRound(getHumanChoice(),getComputerChoice());
-        i++;
-    }
+   
+    resultText.textContent = `${transformUpper(human)} VS ${transformUpper(computer)}`;
+    score.textContent = `Jugador: ${humanScore} | Máquina: ${computerScore}`;
 }
 
-playGame();
+
+
